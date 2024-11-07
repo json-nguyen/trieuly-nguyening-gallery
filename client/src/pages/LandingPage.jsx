@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { ArrowUpTrayIcon, PhotoIcon } from '@heroicons/react/24/outline';
-
-function LandingPage() {
+import StyledButton from '../components/shared/StyledButton';
+import { useNavigate } from 'react-router-dom';
+const LandingPage= () => {
+  const navigate = useNavigate()
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center">
@@ -12,14 +14,16 @@ function LandingPage() {
         <img src="assets/Beverly_Jason_Engagement.jpg" alt="Jason+Bev" className="w-full max-w-xs sm:max-w-md md:max-w-lg" />
       </div>
       <div className='mt-4'>
-        <button className="bg-light-purple text-white font-bold py-3 px-10 text-md rounded-md flex items-center justify-center gap-3 hover:bg-light-purple/80 active:bg-clicked-purple transition duration-300 ease-in-out mb-2 w-full">
-          <ArrowUpTrayIcon className="h-6 w-6" />
-          Upload Images + Videos
-        </button>
-        <button className="bg-light-purple text-white font-bold py-3 px-10 text-md rounded-md flex items-center justify-center gap-3 hover:bg-light-purple/80 active:bg-clicked-purple transition duration-300 ease-in-out w-full">
-        <PhotoIcon className="h-6 w-6" />
-          View Gallery
-        </button>
+        <StyledButton 
+          icon={<ArrowUpTrayIcon className="h-6 w-6"/>}
+          onClick={() => navigate("/gallery")}
+          buttonText={"Upload Images + Videos"}
+          />
+        <StyledButton
+          icon={<PhotoIcon className="h-6 w-6" />}
+          onClick={() => navigate("/gallery")}
+          buttonText={"View Gallery"}
+        />
       </div>
       <div className="mt-4">
         <img src="assets/jason_bev_name.png" alt="Jason+Bev" className="w-full max-w-xs sm:max-w-md md:max-w-lg" />
