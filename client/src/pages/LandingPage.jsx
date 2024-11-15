@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ArrowUpTrayIcon, PhotoIcon } from '@heroicons/react/24/outline';
 import StyledButton from '../components/shared/StyledButton';
 import { useNavigate } from 'react-router-dom';
+
 const LandingPage= () => {
   const navigate = useNavigate()
 
@@ -34,6 +35,7 @@ const LandingPage= () => {
           Feel free to capture memories, upload photos, and enjoy the gallery. Here’s to a day full of love, laughter, and memories!
         </p>
       </div>
+      
     </div>
   )
 }
