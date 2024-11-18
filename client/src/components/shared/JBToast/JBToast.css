@@ -1,0 +1,13 @@
+.jb-toast {
+  background-color: #D8CFEE !important; 
+  color: white !important; 
+  font-family: "Quincy", sans-serif; 
+  font-weight: bold !important;
+  border-radius: 8px; 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
+}
+
+.jb-toast-progress {
+  background-color: white !important; 
+  border-radius: 2px;
+}
