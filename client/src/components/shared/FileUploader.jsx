@@ -9,7 +9,7 @@ const FileUploader = () => {
   const [uploading, setUploading] = useState(false);
 
   const allowedTypes = ["image/jpeg", "image/png", "image/gif", "video/mp4"];
-  const maxFileSize = 5 * 1024 * 1024; // 5MB
+  const maxFileSize = 20 * 1024 * 1024; // 5MB
 
   const handleFileChange = async (event) => {
     const files = event.target.files;
