@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from "react-toastify";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from '../../services/firebase';
 
 const FileUploader = () => {
   const [error, setError] = useState("");
@@ -11,14 +13,13 @@ const FileUploader = () => {
 
   const handleFileChange = async (event) => {
     const files = event.target.files;
+
     if (files.length > 0) {
       setUploading(true);
 
-      // Validate files (e.g., check types and size)
+      // Validate files
       const validFiles = Array.from(files).filter((file) => {
-        const validTypes = ["image/jpeg", "image/png", "video/mp4"];
-        const maxSizeMB = 5; // 5MB limit
-        return validTypes.includes(file.type) && file.size <= maxSizeMB * 1024 * 1024;
+        return allowedTypes.includes(file.type) && file.size <= maxFileSize;
       });
 
       if (validFiles.length === 0) {
@@ -27,19 +28,39 @@ const FileUploader = () => {
         return;
       }
 
-      // Upload valid files
-      try {
-        await onUpload(validFiles); // Replace with your upload function
-        toast.error("Files uploaded successfully!");
-      } catch (error) {
-        console.error("Upload failed:", error);
-        toast.error("Upload failed. Please try again.");
-      } finally {
-        setUploading(false);
+      for (const file of validFiles) {
+        // Upload files to firebase with filepath.
+        const fileRef = ref(storage, `uploads/${file.name}-${Date.now()}`);
+        const uploadTask = uploadBytesResumable(fileRef, file);
+
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            // Optionally, you can track progress here
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log(`Upload is ${progress}% done`);
+          },
+          (error) => {
+            console.error("Upload failed:", error);
+            toast.error(`Failed to upload ${file.name}. Please try again.`);
+          },
+          async () => {
+            // Upload completed, get download URL
+            try {
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              console.log("File available at:", downloadURL);
+              toast.success(`${file.name} uploaded successfully!`);
+            } catch (err) {
+              console.error("Error fetching download URL:", err);
+              toast.error(`Error fetching download URL for ${file.name}.`);
+            }
+          }
+        );
       }
+      setUploading(false);
     }
   };
-
+ 
   return (
     <div className="file-uploader">
       <input
@@ -58,12 +79,6 @@ const FileUploader = () => {
         Select Photos/Videos
       </label>
       {error && <p className="text-red-500 mt-2">{error}</p>}
-      <button
-        onClick={() => toast.error("Files Successfully Uploaded")}
-        className="bg-blue-600 text-white font-bold py-2 px-6 mt-4 rounded-md hover:bg-blue-700 transition duration-300"
-      >
-        Upload
-      </button>
     </div>
   );
 };

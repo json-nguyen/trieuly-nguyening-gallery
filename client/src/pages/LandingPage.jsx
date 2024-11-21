@@ -35,7 +35,6 @@ const LandingPage= () => {
           Feel free to capture memories, upload photos, and enjoy the gallery. Here’s to a day full of love, laughter, and memories!
         </p>
       </div>
-      
     </div>
   )
 }

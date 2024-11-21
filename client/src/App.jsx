@@ -3,6 +3,7 @@ import LandingPage from './pages/LandingPage';
 import GalleryPage from './pages/GalleryPage';
 import JBToast from './components/shared/JBToast/JBToast'
 function App() {
+
   return (
     <div>
       <Routes>

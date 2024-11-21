@@ -31,8 +31,6 @@ const GalleryPage = () => {
 				<Gallery
 					photos={photos}
 					columns={(containerWidth) => {
-						console.log("Container width:", containerWidth);
-
 						if (containerWidth >= 900) return 4; // 4 columns for large screens
 						if (containerWidth >= 600) return 3; // 3 columns for medium screens
 						return 2; // 2 columns for small screens

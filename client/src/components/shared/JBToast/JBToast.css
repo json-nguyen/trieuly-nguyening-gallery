@@ -11,3 +11,9 @@
   background-color: white !important; 
   border-radius: 2px;
 }
+
+:root {
+  --toastify-color-error: #FF4500;
+  --toastify-color-success: #2ECC71;
+
+}

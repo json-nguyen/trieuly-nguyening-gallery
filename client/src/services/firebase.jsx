@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCbx1K74RbcoZZwG_HJbdPTagNr90Xoelk",
@@ -15,3 +16,20 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const storage = getStorage(app);
 export const db = getFirestore(app);
+
+const auth = getAuth();
+
+const signIn = async () => {
+  const email = "j.nguyen.ce28@gmail.com"; // 
+  const password = "Hailey"; // 
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    console.log("User signed in successfully!");
+    // Now proceed with the file upload
+  } catch (error) {
+    console.error("Authentication failed:", error.message);
+  }
+};
+
+signIn();
