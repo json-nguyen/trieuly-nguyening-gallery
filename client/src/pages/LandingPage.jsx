@@ -32,7 +32,7 @@ const LandingPage= () => {
       <div className="mt-3 px-6 text-center font-quincy text-gray-700">
         <p className="text-lg sm:text-xl md:text-2xl leading-relaxed">
           We are thrilled to celebrate our special day with you! Thank you for being part of our journey.
-          Feel free to capture memories, upload photos, and enjoy the gallery. Here’s to a day full of love, laughter, and memories!
+          Feel free to capture memories, upload photos, and enjoy the gallery. Here’s to a day full of love, laughter, and memories! Cody's venmo is cody-khong :)
         </p>
       </div>
     </div>

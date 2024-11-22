@@ -18,11 +18,11 @@ const FileUploader = ({ folderName }) => {
 
       // Validate files
       const validFiles = Array.from(files).filter((file) => {
-        return allowedTypes.includes(file.type) && file.size <= maxFileSize;
+        return allowedTypes.includes(file.type);
       });
 
       if (validFiles.length === 0) {
-        toast.error("No valid files selected. Ensure they are images or videos within 5MB.");
+        toast.error("No valid files selected. Ensure they are images or videos within MB.");
         setUploading(false);
         return;
       }

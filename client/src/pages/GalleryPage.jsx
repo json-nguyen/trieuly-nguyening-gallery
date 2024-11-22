@@ -25,10 +25,10 @@ const GalleryPage = () => {
       const urls = await Promise.all(
         result.items.map((item) => getDownloadURL(item))
       );
-      // Transform into the format expected by `react-photo-gallery`
+
       const formattedPhotos = urls.map((url) => ({
         src: url,
-        width: 4, // Example dimensions; adjust based on your images
+        width: 4, 
         height: 3,
       }));
       setPhotos(formattedPhotos);
