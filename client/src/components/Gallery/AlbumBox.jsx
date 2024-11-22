@@ -1,6 +1,6 @@
 import React from "react";
 
-const AlbumBox = ({ selected, handleClick, title, coverPath}) => {
+const AlbumBox = ({ selected, handleClick, title, coverPath }) => {
   return (
     <div
       onClick={handleClick}

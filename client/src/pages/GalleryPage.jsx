@@ -1,15 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AlbumBox from "../components/Gallery/AlbumBox";
-import {photos, albums} from "./testData"
+import { albums } from "./testData"
 import Gallery from 'react-photo-gallery';
-import StyledButton from "../components/shared/StyledButton";
-import { ArrowUpTrayIcon } from '@heroicons/react/24/outline';
 import FileUploader from "../components/shared/FileUploader";
+import { ref, getDownloadURL, listAll } from "firebase/storage";
+import { storage } from "../services/firebase";
 
 const GalleryPage = () => {
 	const [selectedAlbum, setSelectedAlbum] = useState(albums[0])
+	const [photos, setPhotos] = useState([]); // Updated state to store photo URLs
+  const [loading, setLoading] = useState(false)
 
-  
+	useEffect(() => {
+		if(selectedAlbum) {
+			fetchPhotos()
+		}
+	}, [selectedAlbum])
+
+	const fetchPhotos = async () => {
+    setLoading(true);
+    const albumRef = ref(storage, selectedAlbum.title); // Album folder reference
+    try {
+      const result = await listAll(albumRef);
+      const urls = await Promise.all(
+        result.items.map((item) => getDownloadURL(item))
+      );
+      // Transform into the format expected by `react-photo-gallery`
+      const formattedPhotos = urls.map((url) => ({
+        src: url,
+        width: 4, // Example dimensions; adjust based on your images
+        height: 3,
+      }));
+      setPhotos(formattedPhotos);
+    } catch (error) {
+      console.error("Error fetching photos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 	return (
 		<div className="bg-gray-100 min-h-screen p-4 flex flex-col">	
 		{/* Album Scroll Container */}
@@ -19,13 +48,13 @@ const GalleryPage = () => {
 						title={album.title}
 						key={album.id}
 						coverPath={album.cover}
-						handleClick={() => setSelectedAlbum(album.id)}
+						handleClick={() => setSelectedAlbum(album)}
 						selected={album.id === selectedAlbum.id}
 					/>
 				))}
 			</div>
 			<div className="mb-2 items-center">
-				<FileUploader />
+				<FileUploader folderName={selectedAlbum.title} />
 			</div>
 			<div>
 				<Gallery

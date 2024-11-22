@@ -3,9 +3,8 @@ import { toast } from "react-toastify";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from '../../services/firebase';
 
-const FileUploader = () => {
+const FileUploader = ({ folderName }) => {
   const [error, setError] = useState("");
-  const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
 
   const allowedTypes = ["image/jpeg", "image/png", "image/gif", "video/mp4"];
@@ -30,7 +29,7 @@ const FileUploader = () => {
 
       for (const file of validFiles) {
         // Upload files to firebase with filepath.
-        const fileRef = ref(storage, `uploads/${file.name}-${Date.now()}`);
+        const fileRef = ref(storage, `${folderName}/${file.name}-${Date.now()}`);
         const uploadTask = uploadBytesResumable(fileRef, file);
 
         uploadTask.on(
