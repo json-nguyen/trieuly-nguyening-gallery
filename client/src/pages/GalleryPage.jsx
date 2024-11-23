@@ -22,15 +22,28 @@ const GalleryPage = () => {
     const albumRef = ref(storage, selectedAlbum.title); // Album folder reference
     try {
       const result = await listAll(albumRef);
-      const urls = await Promise.all(
-        result.items.map((item) => getDownloadURL(item))
-      );
-
-      const formattedPhotos = urls.map((url) => ({
-        src: url,
-        width: 4, 
-        height: 3,
-      }));
+     
+			const formattedPhotos = await Promise.all(
+				result.items.map(async (item) => {
+					const url = await getDownloadURL(item); // Get the download URL for the image
+					
+					// Create an Image object to load the image
+					const img = new Image();
+					img.src = url;
+	
+					// Return a promise that resolves when the image is loaded and its dimensions are available
+					return new Promise((resolve) => {
+						img.onload = () => {
+							resolve({
+								src: url,
+								width: img.width,   // Actual width of the image
+								height: img.height, // Actual height of the image
+							});
+						};
+					});
+				})
+			);
+     
       setPhotos(formattedPhotos);
     } catch (error) {
       console.error("Error fetching photos:", error);
@@ -60,9 +73,10 @@ const GalleryPage = () => {
 				<Gallery
 					photos={photos}
 					columns={(containerWidth) => {
-						if (containerWidth >= 900) return 4; // 4 columns for large screens
-						if (containerWidth >= 600) return 3; // 3 columns for medium screens
-						return 2; // 2 columns for small screens
+						if (photos.length === 1) return 1; // 1 column for one photo
+            if (containerWidth >= 900) return 4; // 4 columns for large screens
+            if (containerWidth >= 600) return 3; // 3 columns for medium screens
+            return 2; // 2 columns for small screens
 					}}
 				/>
 			</div>
