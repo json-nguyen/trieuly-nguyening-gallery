@@ -1,0 +1,13 @@
+/* Add this to your CSS */
+.spinner {
+  display: inline-block;
+  border-style: solid;
+  border-width: 4px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { toast } from "react-toastify";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from '../../services/firebase';
+import UploadProgressWidget from "./UploadProgressWidget/UploadProgressWidget";
 
 const FileUploader = ({ folderName }) => {
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploads, setUploads] = useState([]);
+  const [completedFiles, setCompletedFiles] = useState(0);
 
   const allowedTypes = ["image/jpeg", "image/png", "image/gif", "video/mp4"];
   const maxFileSize = 20 * 1024 * 1024; // 5MB
@@ -14,52 +17,64 @@ const FileUploader = ({ folderName }) => {
     const files = event.target.files;
 
     if (files.length > 0) {
-      setUploading(true);
+      const uploadQueue = Array.from(files).map((file) => ({
+        file,
+        progress: 0,
+        status: "uploading",
+      }));
+      setUploads(uploadQueue);
+      setUploading(true)
+      setCompletedFiles(0); 
 
-      // Validate files
-      const validFiles = Array.from(files).filter((file) => {
-        return allowedTypes.includes(file.type);
-      });
-
-      if (validFiles.length === 0) {
-        toast.error("No valid files selected. Ensure they are images or videos within MB.");
-        setUploading(false);
-        return;
-      }
-
-      for (const file of validFiles) {
-        // Upload files to firebase with filepath.
-        const fileRef = ref(storage, `${folderName}/${file.name}-${Date.now()}`);
-        const uploadTask = uploadBytesResumable(fileRef, file);
-
+      Array.from(files).forEach(async (file, index) => {
+        const storageRef = ref(storage, `${folderName}/${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+  
         uploadTask.on(
           "state_changed",
           (snapshot) => {
-            // Optionally, you can track progress here
             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log(`Upload is ${progress}% done`);
+            setUploads((prev) =>
+              prev.map((u, i) =>
+                i === index ? { ...u, progress } : u
+              )
+            );
           },
           (error) => {
             console.error("Upload failed:", error);
-            toast.error(`Failed to upload ${file.name}. Please try again.`);
+            setUploads((prev) =>
+              prev.map((u, i) =>
+                i === index ? { ...u, status: "error" } : u
+              )
+            );
           },
           async () => {
-            // Upload completed, get download URL
-            try {
-              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-              console.log("File available at:", downloadURL);
-              toast.success(`${file.name} uploaded successfully!`);
-            } catch (err) {
-              console.error("Error fetching download URL:", err);
-              toast.error(`Error fetching download URL for ${file.name}.`);
-            }
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            setUploads((prev) =>
+              prev.map((u, i) =>
+                i === index ? { ...u, status: "completed", url: downloadURL } : u
+              )
+            );
+            handleUploadComplete(files.length)
           }
         );
-      }
-      setUploading(false);
+      });
     }
   };
- 
+
+  const handleUploadComplete = (totalFiles) => {
+    setCompletedFiles((prev) => {
+      const updatedCompletedFiles = prev + 1;
+  
+      if (updatedCompletedFiles === totalFiles) {
+        setUploading(false);
+        toast.success("Upload process complete!");
+      }
+  
+      return updatedCompletedFiles; // Update the state
+    });
+  };
+  
   return (
     <div className="file-uploader">
       <input
@@ -77,7 +92,13 @@ const FileUploader = ({ folderName }) => {
       >
         Select Photos/Videos
       </label>
-      {error && <p className="text-red-500 mt-2">{error}</p>}
+      {uploading && (
+        <UploadProgressWidget
+          curFileNumber={completedFiles}
+          totalFiles={uploads.length}
+        />
+      )}
+      
     </div>
   );
 };
