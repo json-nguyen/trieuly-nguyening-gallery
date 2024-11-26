@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import AlbumBox from "../components/Gallery/AlbumBox";
 import { albums } from "./testData"
 import Gallery from 'react-photo-gallery';
 import FileUploader from "../components/shared/FileUploader";
 import { ref, getDownloadURL, listAll } from "firebase/storage";
 import { storage } from "../services/firebase";
+import Carousel, { Modal, ModalGateway } from "react-images";
 
 const GalleryPage = () => {
 	const [selectedAlbum, setSelectedAlbum] = useState(albums[0])
 	const [photos, setPhotos] = useState([]); // Updated state to store photo URLs
   const [loading, setLoading] = useState(false)
+  const [currentImage, setCurrentImage] = useState(0);
+  const [viewerOpen, setViewerOpen] = useState(false);
 
 	useEffect(() => {
 		if(selectedAlbum) {
@@ -52,6 +55,17 @@ const GalleryPage = () => {
     }
   };
 
+	const openLightbox = useCallback((event, { photo, index }) => {
+		console.log('OPENING', index)
+    setCurrentImage(index);
+    setViewerOpen(true);
+  }, []);
+
+  const closeLightbox = () => {
+    setCurrentImage(0);
+    setViewerOpen(false);
+  };
+
 	return (
 		<div className="bg-gray-100 min-h-screen p-4 flex flex-col">	
 		{/* Album Scroll Container */}
@@ -78,7 +92,22 @@ const GalleryPage = () => {
             if (containerWidth >= 600) return 3; // 3 columns for medium screens
             return 2; // 2 columns for small screens
 					}}
+					onClick={openLightbox}
 				/>
+				 <ModalGateway>
+					{viewerOpen ? (
+						<Modal onClose={closeLightbox}>
+							<Carousel
+								currentIndex={currentImage}
+								views={photos.map(x => ({
+									...x,
+									srcset: x.srcSet,
+									caption: x.title
+								}))}
+							/>
+						</Modal>
+					) : null}
+				</ModalGateway>
 			</div>
 		</div>
 	);  
