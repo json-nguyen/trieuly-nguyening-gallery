@@ -22,19 +22,17 @@ const GalleryPage = () => {
 
 	const fetchPhotos = async () => {
     setLoading(true);
-    const albumRef = ref(storage, selectedAlbum.title); // Album folder reference
+    const albumRef = ref(storage, selectedAlbum.title); 
     try {
       const result = await listAll(albumRef);
      
 			const formattedPhotos = await Promise.all(
 				result.items.map(async (item) => {
-					const url = await getDownloadURL(item); // Get the download URL for the image
+					const url = await getDownloadURL(item); 
 					
-					// Create an Image object to load the image
 					const img = new Image();
 					img.src = url;
 	
-					// Return a promise that resolves when the image is loaded and its dimensions are available
 					return new Promise((resolve) => {
 						img.onload = () => {
 							resolve({
