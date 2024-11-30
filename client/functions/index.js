@@ -1,19 +1,66 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+import * as functions from "firebase-functions";
+import * as admin from "firebase-admin";
+import * as ffmpeg from "fluent-ffmpeg";
+import ffmpegPath from "@ffmpeg-installer/ffmpeg";
+import * as path from "path";
+import * as os from "os";
+import * as fs from "fs";
 
-const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
+admin.initializeApp();
+ffmpeg.setFfmpegPath(ffmpegPath.path);
+const bucket = admin.storage().bucket();
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+export const generateVideoThumbnail = functions.storage
+  .object()
+  .onFinalize(async (object) => {
+    const filePath = object.name || "";
+    const contentType = object.contentType || "";
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+    // Only process video files
+    if (!contentType.startsWith("video/")) {
+      console.log("Not a video file. Exiting...");
+      return null;
+    }
+
+    const fileName = path.basename(filePath);
+    const tempLocalFile = path.join(os.tmpdir(), fileName);
+    const tempThumbnailFile = path.join(
+      os.tmpdir(),
+      `${fileName}-thumbnail.jpg`
+    );
+    const thumbnailPath = `${path.dirname(filePath)}/thumbnails/${fileName}-thumbnail.jpg`;
+
+    try {
+      // Download video to a temporary location
+      await bucket.file(filePath).download({ destination: tempLocalFile });
+      console.log(`Downloaded video: ${filePath}`);
+
+      // Generate thumbnail using FFmpeg
+      await new Promise((resolve, reject) => {
+        ffmpeg(tempLocalFile)
+          .screenshots({
+            count: 1,
+            folder: os.tmpdir(),
+            filename: `${fileName}-thumbnail.jpg`,
+          })
+          .on("end", resolve)
+          .on("error", reject);
+      });
+      console.log("Thumbnail generated.");
+
+      // Upload thumbnail to Firebase Storage
+      await bucket.upload(tempThumbnailFile, {
+        destination: thumbnailPath,
+        metadata: { contentType: "image/jpeg" },
+      });
+      console.log(`Uploaded thumbnail to: ${thumbnailPath}`);
+    } catch (error) {
+      console.error("Error generating thumbnail:", error);
+    } finally {
+      // Clean up temporary files
+      fs.unlinkSync(tempLocalFile);
+      fs.unlinkSync(tempThumbnailFile);
+    }
+
+    return null;
+  });
