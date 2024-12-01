@@ -5,14 +5,14 @@ import Gallery from 'react-photo-gallery';
 import FileUploader from "../components/shared/FileUploader";
 import { ref, getDownloadURL, listAll, getMetadata } from "firebase/storage";
 import { storage } from "../services/firebase";
-import Carousel, { Modal, ModalGateway } from "react-images";
+import ContentCarousel from "../components/Gallery/ContentCarousel";
 
 const GalleryPage = () => {
 	const [selectedAlbum, setSelectedAlbum] = useState(albums[0])
 	const [photos, setPhotos] = useState([]); // Updated state to store photo URLs
   const [loading, setLoading] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
-  const [viewerOpen, setViewerOpen] = useState(false);
 
 	useEffect(() => {
 		if(selectedAlbum) {
@@ -49,7 +49,7 @@ const GalleryPage = () => {
 								src: imageUrl,
 								width: img.width,   // Actual width of the image
 								height: img.height, // Actual height of the image
-								type: isVideo ? "video" : "image",
+								type: isVideo ? 'video' : 'image',
 								originalUrl: url,
 							});
 						};
@@ -65,15 +65,15 @@ const GalleryPage = () => {
     }
   };
 
-	const openLightbox = useCallback((event, { photo, index }) => {
+  const openModal = useCallback((event, { index }) => {
     setCurrentImage(index);
-    setViewerOpen(true);
+    setModalOpen(true);
   }, []);
 
-  const closeLightbox = () => {
-    setCurrentImage(0);
-    setViewerOpen(false);
+	const closeModal = () => {
+    setModalOpen(false);
   };
+
 
 	return (
 		<div className="bg-gray-100 min-h-screen p-4 flex flex-col">	
@@ -101,22 +101,15 @@ const GalleryPage = () => {
             if (containerWidth >= 600) return 3; // 3 columns for medium screens
             return 2; // 2 columns for small screens
 					}}
-					onClick={openLightbox}
+					onClick={openModal}
 				/>
-				 <ModalGateway>
-					{viewerOpen ? (
-						<Modal onClose={closeLightbox}>
-							<Carousel
-								currentIndex={currentImage}
-								views={photos.map(x => ({
-									...x,
-									srcset: x.srcSet,
-									caption: x.title
-								}))}
-							/>
-						</Modal>
-					) : null}
-				</ModalGateway>
+				<ContentCarousel
+					data={photos}
+					open={modalOpen}
+					onClose={closeModal}
+					currentIndex={currentImage}
+					setCurrentIndex={setCurrentImage}
+				/>
 			</div>
 		</div>
 	);  
