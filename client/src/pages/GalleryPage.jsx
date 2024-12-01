@@ -29,16 +29,30 @@ const GalleryPage = () => {
 			const formattedPhotos = await Promise.all(
 				result.items.map(async (item) => {
 					const url = await getDownloadURL(item); 
-					
+					console.log('fetcing', url)
+					const isVideo = item.name.endsWith(".mp4"); // Adjust for your video extensions
+					let imageUrl = url
+					console.log(isVideo)
+					if(isVideo) {
+						const thumbnailPath = `${selectedAlbum.title}/thumbnails/${item.name.replace(
+              ".mp4",
+              "-thumbnail.jpg"
+            )}`;
+						imageUrl = await getDownloadURL(ref(storage, thumbnailPath))
+						console.log(imageUrl)
+					}
+
 					const img = new Image();
-					img.src = url;
-	
+					img.src = imageUrl
+
 					return new Promise((resolve) => {
 						img.onload = () => {
 							resolve({
-								src: url,
+								src: imageUrl,
 								width: img.width,   // Actual width of the image
 								height: img.height, // Actual height of the image
+								type: isVideo ? "video" : "image",
+								originalUrl: url,
 							});
 						};
 					});
