@@ -54,7 +54,6 @@ const GalleryPage = () => {
   };
 
 	const openLightbox = useCallback((event, { photo, index }) => {
-		console.log('OPENING', index)
     setCurrentImage(index);
     setViewerOpen(true);
   }, []);

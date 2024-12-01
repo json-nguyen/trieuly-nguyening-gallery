@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from '../../services/firebase';
 import UploadProgressWidget from "./UploadProgressWidget/UploadProgressWidget";
+import { v4 as uuidv4 } from 'uuid';
 
 const FileUploader = ({ folderName }) => {
   const [uploading, setUploading] = useState(false);
@@ -25,7 +26,7 @@ const FileUploader = ({ folderName }) => {
 
       const uploadPromises = Array.from(files).map((file, index) => {
         return new Promise((resolve, reject) => {
-          const storageRef = ref(storage, `${folderName}/${file.name}`);
+          const storageRef = ref(storage, `${folderName}/${uuidv4()}.mp4`);
           const uploadTask = uploadBytesResumable(storageRef, file);
 
           uploadTask.on(
@@ -86,7 +87,7 @@ const FileUploader = ({ folderName }) => {
       </label>
       {uploading && (
         <UploadProgressWidget
-          curFileNumber={uploads.filter(u => u.status === "completed").length}
+          curFileNumber={uploads.filter(u => u.status === "completed").length + 1}
           totalFiles={uploads.length}
         />
       )}
