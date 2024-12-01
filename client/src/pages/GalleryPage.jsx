@@ -3,7 +3,7 @@ import AlbumBox from "../components/Gallery/AlbumBox";
 import { albums } from "./testData"
 import Gallery from 'react-photo-gallery';
 import FileUploader from "../components/shared/FileUploader";
-import { ref, getDownloadURL, listAll } from "firebase/storage";
+import { ref, getDownloadURL, listAll, getMetadata } from "firebase/storage";
 import { storage } from "../services/firebase";
 import Carousel, { Modal, ModalGateway } from "react-images";
 
@@ -29,15 +29,13 @@ const GalleryPage = () => {
 			const formattedPhotos = await Promise.all(
 				result.items.map(async (item) => {
 					const url = await getDownloadURL(item); 
-					console.log('fetcing', url)
-					const isVideo = item.name.endsWith(".mp4"); // Adjust for your video extensions
+					const metadata = await getMetadata(item);
+					const contentType = metadata.contentType;
+					const isVideo = contentType && contentType.startsWith("video/");
+
 					let imageUrl = url
-					console.log(isVideo)
 					if(isVideo) {
-						const thumbnailPath = `${selectedAlbum.title}/thumbnails/${item.name.replace(
-              ".mp4",
-              "-thumbnail.jpg"
-            )}`;
+						const thumbnailPath = `${selectedAlbum.title}/thumbnails/${item.name.split('.')[0]}-thumbnail.jpg`;
 						imageUrl = await getDownloadURL(ref(storage, thumbnailPath))
 						console.log(imageUrl)
 					}

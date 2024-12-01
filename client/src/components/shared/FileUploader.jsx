@@ -28,7 +28,10 @@ const FileUploader = ({ folderName }) => {
       const uploadPromises = Array.from(files).map((file, index) => {
         return new Promise((resolve, reject) => {
           const fileExtension = file.name.substring(file.name.lastIndexOf("."));
-          const storageRef = ref(storage, `${folderName}/${uuidv4()}.${fileExtension}`);
+          const uploadPath = `${folderName}/${uuidv4()}${fileExtension}`
+          console.log("uploading", uploadPath)
+          const storageRef = ref(storage, uploadPath);
+
           const uploadTask = uploadBytesResumable(storageRef, file);
 
           uploadTask.on(

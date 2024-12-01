@@ -13,9 +13,10 @@ exports.generateVideoThumbnail = onObjectFinalized({region: 'us-east1'}, async (
     const filePath = event.data.name;  // e.g., "album1/video1.mp4"
     const fileBucket = event.data.bucket;
     const fileName = path.basename(filePath); // e.g., "video1.mp4"
+    const contentType = event.data.contentType; // Get the MIME type
 
     console.log ("Uploading", fileName)
-    if (!fileName.endsWith(".mp4")) {
+    if (!contentType || !contentType.startsWith("video/")) {
       console.log("Not a video file.");
       return null;
     }
