@@ -4,20 +4,28 @@ import { Modal } from 'react-responsive-modal';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import 'react-responsive-modal/styles.css';
 import './ContentCarousel.css'
+import { XMarkIcon} from '@heroicons/react/24/outline';
 
 const ContentCarousel = ({data, open, onClose, currentIndex, setCurrentIndex}) => {
   return (
     <Modal 
+      className="p-5"
       open={open} 
       onClose={onClose} 
       center
       showCloseIcon={false} 
       classNames={{
-        overlay: 'custom-modal-overlay',
-        modal: 'custom-modal-content',
+        overlay: 'modal-overlay',
+        modal: 'modal-content',
       }}
     >
-     
+      <div
+        className="close-icon"
+        onClick={onClose}
+        aria-label="Close Modal"
+      >
+        <XMarkIcon className="h-8 w-8 text-white" />
+      </div>
       <Carousel
         selectedItem={currentIndex}
         onChange={(index) => setCurrentIndex(index)}

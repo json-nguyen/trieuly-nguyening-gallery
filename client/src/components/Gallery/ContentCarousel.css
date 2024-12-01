@@ -1,18 +1,17 @@
-.custom-modal-overlay {
+.modal-overlay {
   background: rgba(0, 0, 0, 0.8); /* Dark transparent background */
 }
 
-.custom-modal-content {
+.modal-content {
   background: transparent;
   box-shadow: none; /* Remove shadow around modal content */
 }
 
-.custom-close-icon {
+.close-icon {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 0;
+  right: 0;
   font-size: 24px;
-  color: white;
   cursor: pointer;
   z-index: 1050; /* Ensure it appears above everything */
 }
