@@ -5,6 +5,8 @@
 .modal-content {
   background: transparent;
   box-shadow: none; /* Remove shadow around modal content */
+  padding: 3rem;
+
 }
 
 .close-icon {
