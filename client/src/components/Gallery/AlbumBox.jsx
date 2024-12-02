@@ -1,7 +1,6 @@
 import React from "react";
 
 const AlbumBox = ({ selected, handleClick, title, coverPath }) => {
-  console.log('coverPath')
   return (
     <div
       onClick={handleClick}

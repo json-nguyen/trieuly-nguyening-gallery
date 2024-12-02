@@ -5,16 +5,17 @@
 .modal-content {
   background: transparent;
   box-shadow: none; /* Remove shadow around modal content */
-  padding: 3rem;
-
+  padding: 3rem 1rem 1rem 0;
 }
 
-.close-icon {
+.icon-container {
   position: fixed;
   top: 0;
   right: 0;
   font-size: 24px;
+  padding-right: 10px;
   cursor: pointer;
   z-index: 1050; /* Ensure it appears above everything */
 }
+
 

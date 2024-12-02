@@ -37,7 +37,6 @@ const GalleryPage = () => {
 					if(isVideo) {
 						const thumbnailPath = `${selectedAlbum.title}/thumbnails/${item.name.split('.')[0]}-thumbnail.jpg`;
 						imageUrl = await getDownloadURL(ref(storage, thumbnailPath))
-						console.log(imageUrl)
 					}
 
 					const img = new Image();
@@ -51,6 +50,7 @@ const GalleryPage = () => {
 								height: img.height, // Actual height of the image
 								type: isVideo ? 'video' : 'image',
 								originalUrl: url,
+								title: item.name
 							});
 						};
 					});
