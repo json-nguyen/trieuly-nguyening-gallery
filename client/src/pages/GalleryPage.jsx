@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import AlbumBox from "../components/Gallery/AlbumBox";
-import { albums } from "./testData"
+import { albums } from "../constants/albums"
 import Gallery from 'react-photo-gallery';
 import FileUploader from "../components/shared/FileUploader";
 import { ref, getDownloadURL, listAll, getMetadata } from "firebase/storage";

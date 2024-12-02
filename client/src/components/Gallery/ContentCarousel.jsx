@@ -9,7 +9,6 @@ import { XMarkIcon} from '@heroicons/react/24/outline';
 const ContentCarousel = ({data, open, onClose, currentIndex, setCurrentIndex}) => {
   return (
     <Modal 
-      className="p-5"
       open={open} 
       onClose={onClose} 
       center

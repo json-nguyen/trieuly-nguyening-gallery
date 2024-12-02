@@ -1,6 +1,7 @@
 import React from "react";
 
 const AlbumBox = ({ selected, handleClick, title, coverPath }) => {
+  console.log('coverPath')
   return (
     <div
       onClick={handleClick}
@@ -15,7 +16,7 @@ const AlbumBox = ({ selected, handleClick, title, coverPath }) => {
 
       <div 
         className={
-          `font-quincy absolute bottom-0 left-0 w-full bg-opacity-60 text-black text-center py-1 
+          `font-quincy absolute bottom-0 left-0 w-full text-black text-center py-1 
           ${selected ? 'bg-clicked-purple' : 'bg-light-purple'}`}
       >
         {title}
