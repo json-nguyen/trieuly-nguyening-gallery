@@ -10,34 +10,37 @@ const ContentCarousel = ({data, open, onClose, currentIndex, setCurrentIndex}) =
   const currentItem = data[currentIndex]; // Get the current item
 
   const downloadFile = async () => {
-    if (!currentItem) return;
-  
-    const url = currentItem.type === 'video' ? currentItem.originalUrl : currentItem.src;
-  
+    const isShareSupported = navigator.canShare && navigator.canShare({ files: [new File([], '')] });
+
     try {
-      // Fetch the file as a blob
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Failed to fetch the file');
+      // Fetch the file as a Blob
+      const url = currentItem.type === 'video' ? currentItem.originalUrl: currentItem.src
+      if (isShareSupported) {
+        // Web Share API for supported browsers (iOS and modern browsers)
+        const response = await fetch(url);
+        const blob = await response.blob();
+        console.log('cur', currentItem)
+        console.log('blob', blob)
+        const file = new File([blob], currentItem.title, { type: blob.type });
+
+        await navigator.share({
+          files: [file],
+          title: 'Download or Share',
+          text: `Check out this ${currentItem.type}`
+        });
+      } else {
+        // Fallback to traditional download method for unsupported browsers
+        const response = await fetch(url);
+        const blob = await response.blob();
+
+        // Create a temporary link to trigger the download
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = currentItem.title; // Set the desired filename
+        link.click(); // Trigger the download
       }
-  
-      const blob = await response.blob();
-  
-      // Create a temporary link to trigger the download
-      const tempLink = document.createElement('a');
-      tempLink.href = URL.createObjectURL(blob);
-      tempLink.download = currentItem.title || 'downloaded-file'; // Set file name
-      tempLink.style.display = 'none';
-  
-      // Append link to the DOM, trigger the click, and remove the link
-      document.body.appendChild(tempLink);
-      tempLink.click();
-  
-      // Clean up
-      URL.revokeObjectURL(tempLink.href);
-      document.body.removeChild(tempLink);
     } catch (error) {
-      console.error('Failed to download the file:', error);
+      console.error('Download failed', error);
     }
   };
 
