@@ -1,6 +1,11 @@
 [
   {
-    "origin": ["http://localhost:3000", "https://trieuly-nguyening-gallery.web.app"],
+    "origin": [
+      "http://localhost:3000", 
+      "https://trieuly-nguyening-gallery.web.app", 
+      "https://trieulynguyening.com",
+      "https://www.trieulynguyening.com"
+    ],
     "method": ["GET", "POST"],
     "maxAgeSeconds": 3600
   }

@@ -4,7 +4,7 @@ const AlbumBox = ({ selected, handleClick, title, coverPath }) => {
   return (
     <div
       onClick={handleClick}
-      className={`flex-shrink-0 w-36 h-36 sm:w-48 sm:h-48 rounded-sm overflow-hidden shadow-lg bg-white relative
+      className={`flex-shrink-0 w-36 h-36 sm:w-48 sm:h-48 rounded-lg overflow-hidden shadow-lg bg-white relative
                     transform transition duration-200 ease-in-out hover:scale-105 active:scale-95`}
     >
       <img

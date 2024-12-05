@@ -19,8 +19,6 @@ const ContentCarousel = ({data, open, onClose, currentIndex, setCurrentIndex}) =
         // Web Share API for supported browsers (iOS and modern browsers)
         const response = await fetch(url);
         const blob = await response.blob();
-        console.log('cur', currentItem)
-        console.log('blob', blob)
         const file = new File([blob], currentItem.title, { type: blob.type });
 
         await navigator.share({

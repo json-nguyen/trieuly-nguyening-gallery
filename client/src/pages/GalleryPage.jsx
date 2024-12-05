@@ -6,6 +6,7 @@ import FileUploader from "../components/shared/FileUploader";
 import { ref, getDownloadURL, listAll, getMetadata } from "firebase/storage";
 import { storage } from "../services/firebase";
 import ContentCarousel from "../components/Gallery/ContentCarousel";
+import JBLoader from "../components/shared/JBLoader";
 
 const GalleryPage = () => {
 	const [selectedAlbum, setSelectedAlbum] = useState(albums[0])
@@ -92,17 +93,22 @@ const GalleryPage = () => {
 			<div className="mb-2 items-center">
 				<FileUploader folderName={selectedAlbum.title} />
 			</div>
-			<div>
-				<Gallery
-					photos={photos}
-					columns={(containerWidth) => {
-						if (photos.length === 1) return 1; // 1 column for one photo
-            if (containerWidth >= 900) return 4; // 4 columns for large screens
-            if (containerWidth >= 600) return 3; // 3 columns for medium screens
-            return 2; // 2 columns for small screens
-					}}
-					onClick={openModal}
-				/>
+			<div className={`${loading ? "flex justify-center" : ""}`}>
+				{loading ? (
+					<JBLoader />
+				) : (
+					<Gallery
+						photos={photos}
+						columns={(containerWidth) => {
+							if (photos.length === 1) return 1; // 1 column for one photo
+							if (containerWidth >= 900) return 4; // 4 columns for large screens
+							if (containerWidth >= 600) return 3; // 3 columns for medium screens
+							return 2; // 2 columns for small screens
+						}}
+						onClick={openModal}
+				/>	
+				) }
+			
 				<ContentCarousel
 					data={photos}
 					open={modalOpen}
