@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ArrowUpTrayIcon, PhotoIcon } from '@heroicons/react/24/outline';
+import React from 'react'
+import { PhotoIcon } from '@heroicons/react/24/outline';
 import StyledButton from '../components/shared/StyledButton';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,17 +16,12 @@ const LandingPage= () => {
       </div>
       <div className='mt-4'>
         <StyledButton 
-          icon={<ArrowUpTrayIcon className="h-6 w-6"/>}
+          icon={<PhotoIcon className="h-6 w-6"/>}
           onClick={() => navigate("/gallery")}
-          buttonText={"Upload Images + Videos"}
+          buttonText={"Upload + View Gallery"}
           />
-        <StyledButton
-          icon={<PhotoIcon className="h-6 w-6" />}
-          onClick={() => navigate("/gallery")}
-          buttonText={"View Gallery"}
-        />
       </div>
-      <div className="mt-4">
+      <div className="mt-2">
         <img src="assets/jason_bev_name.png" alt="Jason+Bev" className="w-full max-w-xs sm:max-w-md md:max-w-lg" />
       </div>
       <div className="mt-3 px-6 text-center font-quincy text-gray-700">
