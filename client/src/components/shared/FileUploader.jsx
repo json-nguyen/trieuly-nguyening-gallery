@@ -82,13 +82,17 @@ const FileUploader = ({ folderName }) => {
         onChange={handleFileChange}
         className="hidden" // Hide default input
         id="file-input"
+        disabled={uploading} // Disable the input while uploading
       />
       <label
         htmlFor="file-input"
-        className="bg-light-purple text-white font-bold py-3 px-10 text-md rounded-md flex items-center justify-center gap-3 hover:bg-light-purple/80 active:bg-clicked-purple transition duration-300 ease-in-out cursor-pointer
-                  w-full sm:w-3/4 md:w-1/2 lg:w-1/3"
+        className={`bg-light-purple text-white font-bold py-3 px-10 text-md rounded-md flex items-center justify-center gap-3
+          w-full sm:w-3/4 md:w-1/2 lg:w-1/3
+          ${uploading ? "bg-gray-400 cursor-not-allowed" : "hover:bg-light-purple/80 active:bg-clicked-purple"}
+          transition duration-300 ease-in-out cursor-pointer`}
+        style={uploading ? { pointerEvents: "none" } : {}}
       >
-        Select Photos/Videos
+        {uploading ? "Uploading..." : "Select Photos/Videos"}
       </label>
       {uploading && (
         <UploadProgressWidget

@@ -9,7 +9,7 @@ const fs = require("fs").promises;
 admin.initializeApp();
 
 const storage = getStorage();
-exports.generateVideoThumbnail = onObjectFinalized({region: 'us-east1'}, async (event) => {
+exports.generateVideoThumbnail = onObjectFinalized({region: 'us-east1', memory: '512MiB'}, async (event) => {
     const filePath = event.data.name;  // e.g., "album1/video1.mp4"
     const fileBucket = event.data.bucket;
     const fileName = path.basename(filePath); // e.g., "video1.mp4"
