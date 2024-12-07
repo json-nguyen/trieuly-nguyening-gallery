@@ -106,7 +106,11 @@ const GalleryPage = () => {
         dataLength={photos.length} // Current photos count
         next={handleLoadMore} // Function to fetch more photos
         hasMore={!allLoaded} // Check if more photos are available
-        loader={<JBLoader />} // Loading indicator
+        loader={
+					<div className="flex justify-center items-center">
+						<JBLoader />
+					</div>
+				} // Loading indicator
         endMessage={<p style={{ textAlign: "center" }}>You have seen it all!</p>} // End message
       >
 				{/* Album Scroll Container */}
