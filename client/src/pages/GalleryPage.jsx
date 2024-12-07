@@ -45,9 +45,9 @@ const GalleryPage = () => {
         setAllLoaded(true); 
         return;
       }
-
+			console.log(`fetching ${items.length} at index ${startIndex}`)
 			const formattedPhotos = await Promise.all(
-				result.items.map(async (item) => {
+				items.map(async (item) => {
 					const url = await getDownloadURL(item); 
 					const metadata = await getMetadata(item);
 					const contentType = metadata.contentType;
