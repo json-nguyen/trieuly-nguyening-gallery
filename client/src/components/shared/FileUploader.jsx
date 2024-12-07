@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { toast } from "react-toastify";
 import { ref, uploadBytesResumable, getDownloadURL, getMetadata } from "firebase/storage";
 import { storage } from '../../services/firebase';
 import UploadProgressWidget from "./UploadProgressWidget/UploadProgressWidget";
 import { v4 as uuidv4 } from 'uuid';
 import { generateTimestamp } from '../../utils/time';
+import { ArrowUpOnSquareIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
+import StyledButton from './StyledButton';
 const FileUploader = ({ folderName, onFileUpload }) => {
   const [uploading, setUploading] = useState(false);
   const [uploads, setUploads] = useState([]);
+  const fileInputRef = useRef(null); // Create a ref for the file input
 
   async function waitForThumbnail(thumbnailPath, maxRetries = 50, delayMs = 2000) {
     let retries = 0;
@@ -34,6 +37,12 @@ const FileUploader = ({ folderName, onFileUpload }) => {
   
     throw new Error("Thumbnail generation timed out.");
   }
+
+  const handleClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click(); // Trigger the file input click
+    }
+  };
 
   const handleFileChange = async (event) => {
     const files = Array.from(event.target.files);
@@ -134,8 +143,9 @@ const FileUploader = ({ folderName, onFileUpload }) => {
   }
 
   return (
-    <div className="file-uploader">
+    <div>
       <input
+        ref={fileInputRef} // Assign the ref to the file input
         type="file"
         accept="image/*,video/*"
         multiple
@@ -144,16 +154,12 @@ const FileUploader = ({ folderName, onFileUpload }) => {
         id="file-input"
         disabled={uploading} // Disable the input while uploading
       />
-      <label
-        htmlFor="file-input"
-        className={`bg-light-purple text-white font-bold py-3 px-10 text-md rounded-md flex items-center justify-center gap-3
-          w-full sm:w-3/4 md:w-1/2 lg:w-1/3
-          ${uploading ? "bg-gray-400 cursor-not-allowed" : "hover:bg-light-purple/80 active:bg-clicked-purple"}
-          transition duration-300 ease-in-out cursor-pointer`}
-        style={uploading ? { pointerEvents: "none" } : {}}
-      >
-        {uploading ? "Uploading..." : "Select Photos/Videos"}
-      </label>
+        <StyledButton
+          icon={<ArrowUpTrayIcon className="h-6 w-6"/>}
+          onClick={handleClick} // Trigger file input click on button click
+          buttonText= {uploading ? "Uploading..." : "Select Photos/Videos"}
+          disabled={uploading}
+        />    
       {uploading && (
         <UploadProgressWidget
           curFileNumber={uploads.filter(u => u.status === "completed").length + 1}
