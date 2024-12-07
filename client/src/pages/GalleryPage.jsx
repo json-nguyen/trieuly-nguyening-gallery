@@ -125,19 +125,26 @@ const GalleryPage = () => {
 						/>
 					))}
 				</div>
+				{}
 				<div className="mb-2 items-center">
 					<FileUploader folderName={selectedAlbum.title} />
 				</div>
-				<Gallery
-					photos={photos}
-					columns={(containerWidth) => {
-						if (photos.length === 1) return 1; // 1 column for one photo
-						if (containerWidth >= 900) return 4; // 4 columns for large screens
-						if (containerWidth >= 600) return 3; // 3 columns for medium screens
-						return 2; // 2 columns for small screens
-					}}
-					onClick={openModal}
-				/>			
+				  {	loading && photos.length === 0 ? ( // Show the loader only for the initial load or album switch
+					<div className="flex justify-center items-center flex-grow">
+						<JBLoader />
+					</div> 
+					) : (
+					<Gallery
+						photos={photos}
+						columns={(containerWidth) => {
+							if (photos.length === 1) return 1; // 1 column for one photo
+							if (containerWidth >= 900) return 4; // 4 columns for large screens
+							if (containerWidth >= 600) return 3; // 3 columns for medium screens
+							return 2; // 2 columns for small screens
+						}}
+						onClick={openModal}
+					/>			
+				)}
 			</InfiniteScroll>	
 			<ContentCarousel
 				data={photos}
