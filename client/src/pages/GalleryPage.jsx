@@ -8,7 +8,7 @@ import ContentCarousel from "../components/Gallery/ContentCarousel";
 import JBLoader from "../components/shared/JBLoader";
 import InfiniteScroll from "react-infinite-scroll-component";
 import "./GalleryPage.css"
-const PHOTOS_PER_PAGE = 20
+const PHOTOS_PER_PAGE = 24
 
 const GalleryPage = () => {
 	const [selectedAlbum, setSelectedAlbum] = useState(albums[0])
