@@ -1,17 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from "react-toastify";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL, getMetadata } from "firebase/storage";
 import { storage } from '../../services/firebase';
 import UploadProgressWidget from "./UploadProgressWidget/UploadProgressWidget";
 import { v4 as uuidv4 } from 'uuid';
 
-const FileUploader = ({ folderName }) => {
+const FileUploader = ({ folderName, onFileUpload }) => {
   const [uploading, setUploading] = useState(false);
   const [uploads, setUploads] = useState([]);
 
+  async function waitForThumbnail(thumbnailPath, maxRetries = 50, delayMs = 2000) {
+    let retries = 0;
+  
+    while (retries < maxRetries) {
+      try {
+        console.log(`Retry number ${retries}`)
+        const thumbnailRef = ref(storage, thumbnailPath);
+        const thumbnailUrl = await getDownloadURL(thumbnailRef);
+        return thumbnailUrl; // Return if successful
+      } catch (error) {
+        console.log(error.code)
+        if (error.code === "storage/object-not-found") {
+          // Thumbnail not found yet, wait and retry
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+          retries++;
+        } else {
+          // Other errors should be logged and rethrown
+          console.error("Error fetching thumbnail:", error);
+          throw error;
+        }
+      }
+    }
+  
+    throw new Error("Thumbnail generation timed out.");
+  }
+
   const handleFileChange = async (event) => {
     const files = Array.from(event.target.files);
-
+    
     const validFiles = files.filter((file) => {
       const typeCategory = file.type.split('/')[0]; // Get 'image' or 'video'
       return typeCategory === 'image' || typeCategory === 'video';
@@ -36,8 +62,8 @@ const FileUploader = ({ folderName }) => {
       const uploadPromises = Array.from(files).map((file, index) => {
         return new Promise((resolve, reject) => {
           const fileExtension = file.name.substring(file.name.lastIndexOf("."));
-          const uploadPath = `${folderName}/${uuidv4()}${fileExtension}`
-          console.log("uploading", uploadPath)
+          const uuid = uuidv4()
+          const uploadPath = `${folderName}/${uuid}${fileExtension}`
           const storageRef = ref(storage, uploadPath);
 
           const uploadTask = uploadBytesResumable(storageRef, file);
@@ -58,9 +84,35 @@ const FileUploader = ({ folderName }) => {
             },
             async () => {
               const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              const metadata = await getMetadata(uploadTask.snapshot.ref);
+              const isVideo = metadata.contentType.startsWith("video");
+              let imageUrl = downloadURL;
+              if (isVideo) {
+                const thumbnailPath = `${folderName}/thumbnails/${uuid}-thumbnail.jpg`;
+                console.log('looking for', thumbnailPath)
+                try {
+                  imageUrl = await waitForThumbnail(thumbnailPath);
+                } catch (error) {
+                  console.error("Failed to fetch video thumbnail:", error);
+                  imageUrl = downloadURL; // Fall back to original video URL if thumbnail fetch fails
+                }
+  }
+
               setUploads((prev) =>
                 prev.map((u, i) => (i === index ? { ...u, status: "completed", url: downloadURL } : u))
               );
+
+              const uploadedFile = {
+                src: imageUrl,
+                originalUrl: downloadURL,
+                title: file.name,
+                type: isVideo ? "video" : "image",
+                width: 1920, // Adjust with actual width if necessary
+                height: 1080, // Adjust with actual height if necessary
+              }
+
+              onFileUpload(uploadedFile)
+              
               resolve();  
             }
           );

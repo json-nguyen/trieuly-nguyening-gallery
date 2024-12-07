@@ -123,6 +123,10 @@ const GalleryPage = () => {
     return 3;
   };
 
+	const handleFileUpload = (uploadedFile) => {
+    setPhotos((prevPhotos) => [uploadedFile, ...prevPhotos]);
+  };
+
 	return (
 		<div className="bg-gray-100 min-h-screen p-4 flex flex-col" ref={containerRef} >	
 			<InfiniteScroll
@@ -150,7 +154,10 @@ const GalleryPage = () => {
 				</div>
 				{}
 				<div className="mb-2 items-center">
-					<FileUploader folderName={selectedAlbum.title} />
+					<FileUploader 
+						folderName={selectedAlbum.title} 
+						onFileUpload={handleFileUpload}
+					/>
 				</div>
 				  {	loading && photos.length === 0 ? ( // Show the loader only for the initial load or album switch
 					<div className="flex justify-center items-center flex-grow">
