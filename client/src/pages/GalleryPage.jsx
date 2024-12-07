@@ -23,7 +23,7 @@ const GalleryPage = () => {
 	useEffect(() => {
 		if(selectedAlbum) {
 			resetGallery()
-			fetchPhotos(0)
+			fetchPhotos(0, true)
 		}
 	}, [selectedAlbum])
 
@@ -33,8 +33,8 @@ const GalleryPage = () => {
     setAllLoaded(false); // Enable loading more photos
   };
 
-	const fetchPhotos = async (page) => {
-		if (loading || allLoaded) return;
+	const fetchPhotos = async (page, resetPhotos) => {
+		if ((loading || allLoaded) && !resetPhotos) return;
 		setLoading(true)
     const albumRef = ref(storage, selectedAlbum.title); 
     try {
@@ -45,7 +45,6 @@ const GalleryPage = () => {
         setAllLoaded(true); 
         return;
       }
-			console.log(`fetching ${items.length} at index ${startIndex}`)
 			const formattedPhotos = await Promise.all(
 				items.map(async (item) => {
 					const url = await getDownloadURL(item); 
@@ -88,7 +87,7 @@ const GalleryPage = () => {
   };
 
 	const handleLoadMore = () => {
-		fetchPhotos(currentPage); // Load the next page
+		fetchPhotos(currentPage, false); // Load the next page
 	};
 	
   const openModal = useCallback((event, { index }) => {
