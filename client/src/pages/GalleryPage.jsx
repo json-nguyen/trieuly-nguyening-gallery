@@ -57,8 +57,12 @@ const GalleryPage = () => {
     const albumRef = ref(storage, selectedAlbum.title); 
     try {
       const result = await listAll(albumRef);
+
+			const sortedItems = result.items.sort((a, b) => b.name.localeCompare(a.name));
+
 			const startIndex = page * PHOTOS_PER_PAGE; 
-      const items = result.items.slice(startIndex, startIndex + PHOTOS_PER_PAGE); 
+      const items = sortedItems.slice(startIndex, startIndex + PHOTOS_PER_PAGE); 
+			console.log(`$Fetching ${items.length} at index ${startIndex}`)
 			if (items.length === 0) {
         setAllLoaded(true); 
         return;

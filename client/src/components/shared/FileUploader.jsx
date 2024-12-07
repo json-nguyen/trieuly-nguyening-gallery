@@ -4,7 +4,7 @@ import { ref, uploadBytesResumable, getDownloadURL, getMetadata } from "firebase
 import { storage } from '../../services/firebase';
 import UploadProgressWidget from "./UploadProgressWidget/UploadProgressWidget";
 import { v4 as uuidv4 } from 'uuid';
-
+import { generateTimestamp } from '../../utils/time';
 const FileUploader = ({ folderName, onFileUpload }) => {
   const [uploading, setUploading] = useState(false);
   const [uploads, setUploads] = useState([]);
@@ -14,7 +14,7 @@ const FileUploader = ({ folderName, onFileUpload }) => {
   
     while (retries < maxRetries) {
       try {
-        console.log(`Retry number ${retries}`)
+        console.log(`Retry number ${retries} for path ${thumbnailPath}`)
         const thumbnailRef = ref(storage, thumbnailPath);
         const thumbnailUrl = await getDownloadURL(thumbnailRef);
         return thumbnailUrl; // Return if successful
@@ -63,7 +63,8 @@ const FileUploader = ({ folderName, onFileUpload }) => {
         return new Promise((resolve, reject) => {
           const fileExtension = file.name.substring(file.name.lastIndexOf("."));
           const uuid = uuidv4()
-          const uploadPath = `${folderName}/${uuid}${fileExtension}`
+          const timestamp = generateTimestamp()
+          const uploadPath = `${folderName}/${timestamp}_${uuid}${fileExtension}`
           const storageRef = ref(storage, uploadPath);
 
           const uploadTask = uploadBytesResumable(storageRef, file);
@@ -88,8 +89,7 @@ const FileUploader = ({ folderName, onFileUpload }) => {
               const isVideo = metadata.contentType.startsWith("video");
               let imageUrl = downloadURL;
               if (isVideo) {
-                const thumbnailPath = `${folderName}/thumbnails/${uuid}-thumbnail.jpg`;
-                console.log('looking for', thumbnailPath)
+                const thumbnailPath = `${folderName}/thumbnails/${timestamp}_${uuid}-thumbnail.jpg`;
                 try {
                   imageUrl = await waitForThumbnail(thumbnailPath);
                 } catch (error) {
