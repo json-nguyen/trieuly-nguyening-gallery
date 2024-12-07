@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef  } from "react";
 import AlbumBox from "../components/Gallery/AlbumBox";
 import { albums } from "../constants/albums"
 import Gallery from 'react-photo-gallery';
@@ -8,7 +8,7 @@ import { storage } from "../services/firebase";
 import ContentCarousel from "../components/Gallery/ContentCarousel";
 import JBLoader from "../components/shared/JBLoader";
 import InfiniteScroll from "react-infinite-scroll-component";
-
+import "./GalleryPage.css"
 const PHOTOS_PER_PAGE = 20
 
 const GalleryPage = () => {
@@ -19,6 +19,8 @@ const GalleryPage = () => {
   const [currentImage, setCurrentImage] = useState(0);
   const [allLoaded, setAllLoaded] = useState(false); 
   const [currentPage, setCurrentPage] = useState(0); 
+  const [containerWidth, setContainerWidth] = useState(0);
+  const containerRef = useRef(null);
 
 	useEffect(() => {
 		if(selectedAlbum) {
@@ -26,6 +28,23 @@ const GalleryPage = () => {
 			fetchPhotos(0, true)
 		}
 	}, [selectedAlbum])
+
+	useEffect(() => {
+    if (containerRef.current) {
+      setContainerWidth(containerRef.current.offsetWidth);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.offsetWidth);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
 	const resetGallery = () => {
     setPhotos([]); // Clear existing photos
@@ -90,7 +109,7 @@ const GalleryPage = () => {
 		fetchPhotos(currentPage, false); // Load the next page
 	};
 	
-  const openModal = useCallback((event, { index }) => {
+  const openModal = useCallback((index) => {
     setCurrentImage(index);
     setModalOpen(true);
   }, []);
@@ -99,9 +118,14 @@ const GalleryPage = () => {
     setModalOpen(false);
   };
 
+  const getColumns = () => {
+    if (containerWidth >= 900) return 5;
+    if (containerWidth >= 600) return 4;
+    return 3;
+  };
 
 	return (
-		<div className="bg-gray-100 min-h-screen p-4 flex flex-col">	
+		<div className="bg-gray-100 min-h-screen p-4 flex flex-col" ref={containerRef} >	
 			<InfiniteScroll
         dataLength={photos.length} // Current photos count
         next={handleLoadMore} // Function to fetch more photos
@@ -134,16 +158,13 @@ const GalleryPage = () => {
 						<JBLoader />
 					</div> 
 					) : (
-					<Gallery
-						photos={photos}
-						columns={(containerWidth) => {
-							if (photos.length === 1) return 1; // 1 column for one photo
-							if (containerWidth >= 900) return 4; // 4 columns for large screens
-							if (containerWidth >= 600) return 3; // 3 columns for medium screens
-							return 2; // 2 columns for small screens
-						}}
-						onClick={openModal}
-					/>			
+					<div className="photo-grid" style={{ gridTemplateColumns: `repeat(${getColumns()}, 1fr)` }}>
+						{photos.map((photo, index) => (
+							<div key={index} className="photo-item" onClick={() => openModal(index)}>
+								<img src={photo.src} alt={photo.title} className="w-full h-auto" />
+							</div>
+						))}
+					</div>
 				)}
 			</InfiniteScroll>	
 			<ContentCarousel

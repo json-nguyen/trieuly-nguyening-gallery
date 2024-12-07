@@ -4,17 +4,25 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from '../../services/firebase';
 import UploadProgressWidget from "./UploadProgressWidget/UploadProgressWidget";
 import { v4 as uuidv4 } from 'uuid';
-import path from "path";
 
 const FileUploader = ({ folderName }) => {
   const [uploading, setUploading] = useState(false);
   const [uploads, setUploads] = useState([]);
 
-  const allowedTypes = ["image/jpeg", "image/png", "image/gif", "video/mp4"];
-  const maxFileSize = 20 * 1024 * 1024; 
-
   const handleFileChange = async (event) => {
-    const files = event.target.files;
+    const files = Array.from(event.target.files);
+
+    const validFiles = files.filter((file) => {
+      const typeCategory = file.type.split('/')[0]; // Get 'image' or 'video'
+      return typeCategory === 'image' || typeCategory === 'video';
+    });
+    
+    const invalidFilesCount = files.length - validFiles.length;
+
+    if (invalidFilesCount > 0) {
+      toast.error(
+        `${invalidFilesCount} file(s) were not valid and will not be uploaded. Files must be images or videos.`
+      );    }
 
     if (files.length > 0) {
       const uploadQueue = Array.from(files).map((file) => ({
