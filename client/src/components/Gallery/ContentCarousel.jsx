@@ -62,6 +62,7 @@ const ContentCarousel = ({data, open, onClose, currentIndex, setCurrentIndex}) =
         onChange={(index) => setCurrentIndex(index)}
         showThumbs={false}
         dynamicHeight={true}
+        showIndicators={false}
       >
         {data.map((item, index) => (
           <div key={index}>
