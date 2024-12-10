@@ -6,16 +6,18 @@ import 'react-responsive-modal/styles.css';
 import './ContentCarousel.css'
 import { XMarkIcon, ArrowDownTrayIcon} from '@heroicons/react/24/outline';
 
+
 const ContentCarousel = ({data, open, onClose, currentIndex, setCurrentIndex}) => {
   const currentItem = data[currentIndex]; // Get the current item
 
   const downloadFile = async () => {
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent); // Detect Safari
     const isShareSupported = navigator.canShare && navigator.canShare({ files: [new File([], '')] });
-
+    (isSafari)
     try {
       // Fetch the file as a Blob
       const url = currentItem.type === 'video' ? currentItem.originalUrl: currentItem.src
-      if (isShareSupported) {
+      if (isSafari && isShareSupported) {
         // Web Share API for supported browsers (iOS and modern browsers)
         const response = await fetch(url);
         const blob = await response.blob();

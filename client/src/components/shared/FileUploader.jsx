@@ -105,7 +105,7 @@ const FileUploader = ({ folderName, onFileUpload }) => {
                   console.error("Failed to fetch video thumbnail:", error);
                   imageUrl = downloadURL; // Fall back to original video URL if thumbnail fetch fails
                 }
-  }
+              }
 
               setUploads((prev) =>
                 prev.map((u, i) => (i === index ? { ...u, status: "completed", url: downloadURL } : u))
@@ -121,7 +121,6 @@ const FileUploader = ({ folderName, onFileUpload }) => {
               }
 
               onFileUpload(uploadedFile)
-              
               resolve();  
             }
           );
